@@ -8,6 +8,9 @@ const PORT = process.env.PORT || 3000;
 
 // Настройки прокси
 const PROXY_URL = 'http://timmycpjj:dGMG8HtDzC@85.209.177.85:59100';
+
+// Добавляем включение TLS без проверки сертификата для обхода проблем с SSL
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 const proxyAgent = new HttpsProxyAgent(PROXY_URL);
 
 app.use(cors());
