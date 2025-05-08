@@ -227,7 +227,7 @@
                     </div>
                     <div class="flex-1">
                         <div class="message-content">
-                            <p>👋 Чем могу помочь?</p>
+                            <p>👋 Привет! Я ваш чат-ассистент на базе языковой модели Llama. Чем я могу вам помочь сегодня?</p>
                         </div>
                     </div>
                 </div>
@@ -251,7 +251,7 @@
                     </div>
                 </form>
                 <div class="text-center text-xs text-gray-500 mt-2">
-                    Модель: Shat GPT
+                    Модель: llama-3.3-70b-versatile
                 </div>
             </div>
         </div>
@@ -274,7 +274,7 @@
 
         // API key for Groq
         const GROQ_API_KEY = "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";
-        const MODEL = "meta-llama/llama-4-maverick-17b-128e-instruct";
+        const MODEL = "llama-3.3-70b-versatile";
 
         // Chat history
         let conversations = [];
@@ -310,6 +310,14 @@
         messageInput.addEventListener('input', function() {
             this.style.height = 'auto';
             this.style.height = (this.scrollHeight < 150 ? this.scrollHeight : 150) + 'px';
+        });
+
+        // Handle Enter key for submission (Shift+Enter for new line)
+        messageInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                messageForm.dispatchEvent(new Event('submit'));
+            }
         });
 
         // Check for saved dark mode preference
@@ -397,7 +405,7 @@
             // Add system message
             messages.push({
                 role: "system",
-                content: "Ты полезный, креативный, но не дружелюбный ассистент. Всегда отвечай максимально информативно и точно. Для кода используй форматирование markdown. "
+                content: "Ты полезный, креативный и дружелюбный ассистент. Всегда отвечай максимально информативно и точно. Для кода используй форматирование markdown."
             });
             
             // Add conversation history
@@ -488,7 +496,7 @@
             
             const typingSpan = document.createElement('span');
             typingSpan.className = 'typing-animation';
-            typingSpan.textContent = 'Печатает...';
+            typingSpan.textContent = 'Печатает';
             
             typingContent.appendChild(typingSpan);
             contentDiv.appendChild(typingContent);
@@ -568,7 +576,7 @@
                 </div>
                 <div class="flex-1">
                     <div class="message-content">
-                        <p>👋 Чем могу помочь?</p>
+                        <p>👋 Привет! Я ваш чат-ассистент на базе языковой модели Llama. Чем я могу вам помочь сегодня?</p>
                     </div>
                 </div>
             `;
@@ -637,7 +645,7 @@
                     </div>
                     <div class="flex-1">
                         <div class="message-content">
-                            <p>👋 Чем могу помочь?</p>
+                            <p>👋 Привет! Я ваш чат-ассистент на базе языковой модели Llama. Чем я могу вам помочь сегодня?</p>
                         </div>
                     </div>
                 `;
