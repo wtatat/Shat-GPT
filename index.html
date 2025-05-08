@@ -21,7 +21,7 @@
         }
         
         .bot-message {
-            background-color: #f7f7f8;
+            background-color: #f7f5f2;
         }
         
         .message-content {
@@ -68,49 +68,49 @@
         
         /* Dark mode toggle */
         .dark-mode {
-            background-color: #343541;
-            color: #ECECF1;
+            background-color: #2d2520;
+            color: #f8f0e8;
         }
         
         .dark-mode .user-message {
-            background-color: #343541;
+            background-color: #2d2520;
         }
         
         .dark-mode .bot-message {
-            background-color: #444654;
+            background-color: #3d322c;
         }
         
         .dark-mode .border-gray-200 {
-            border-color: #565869;
+            border-color: #5a4a40;
         }
         
         .dark-mode .bg-white {
-            background-color: #343541;
+            background-color: #2d2520;
         }
         
         .dark-mode .text-gray-700 {
-            color: #ECECF1;
+            color: #f8f0e8;
         }
         
         .dark-mode .bg-gray-50 {
-            background-color: #444654;
+            background-color: #3d322c;
         }
         
         .dark-mode ::-webkit-scrollbar-track {
-            background: #343541;
+            background: #2d2520;
         }
         
         .dark-mode ::-webkit-scrollbar-thumb {
-            background: #565869;
+            background: #5a4a40;
         }
         
         .dark-mode ::-webkit-scrollbar-thumb:hover {
-            background: #676977;
+            background: #6a584c;
         }
 
         /* Code blocks styling */
         pre {
-            background-color: rgba(0, 0, 0, 0.05);
+            background-color: rgba(120, 83, 58, 0.1);
             border-radius: 6px;
             padding: 12px;
             overflow-x: auto;
@@ -118,7 +118,7 @@
         }
 
         .dark-mode pre {
-            background-color: rgba(0, 0, 0, 0.3);
+            background-color: rgba(120, 83, 58, 0.3);
         }
 
         /* Copy button */
@@ -128,24 +128,24 @@
             right: 8px;
             padding: 4px 8px;
             border-radius: 4px;
-            background-color: rgba(255, 255, 255, 0.1);
-            color: #718096;
+            background-color: rgba(120, 83, 58, 0.2);
+            color: #78533a;
             font-size: 12px;
             cursor: pointer;
             transition: all 0.2s;
         }
 
         .copy-btn:hover {
-            background-color: rgba(255, 255, 255, 0.2);
+            background-color: rgba(120, 83, 58, 0.3);
         }
 
         .dark-mode .copy-btn {
-            background-color: rgba(0, 0, 0, 0.3);
-            color: #CBD5E0;
+            background-color: rgba(120, 83, 58, 0.4);
+            color: #d1baa9;
         }
 
         .dark-mode .copy-btn:hover {
-            background-color: rgba(0, 0, 0, 0.5);
+            background-color: rgba(120, 83, 58, 0.6);
         }
 
         /* Side panel */
@@ -175,48 +175,6 @@
                 z-index: 5;
             }
         }
-
-        /* Режимы API */
-        .api-mode-selector {
-            margin-top: 10px;
-            padding: 5px;
-        }
-        
-        .api-mode-label {
-            display: block;
-            margin-bottom: 5px;
-            font-size: 12px;
-            color: #718096;
-        }
-        
-        .dark-mode .api-mode-label {
-            color: #CBD5E0;
-        }
-        
-        .api-mode-toggle {
-            display: flex;
-            background-color: #f1f1f1;
-            border-radius: 20px;
-            overflow: hidden;
-        }
-        
-        .dark-mode .api-mode-toggle {
-            background-color: #4B5563;
-        }
-        
-        .api-mode-option {
-            flex: 1;
-            text-align: center;
-            padding: 5px;
-            cursor: pointer;
-            font-size: 12px;
-            transition: all 0.3s;
-        }
-        
-        .api-mode-option.active {
-            background-color: #3B82F6;
-            color: white;
-        }
     </style>
 </head>
 <body class="bg-white">
@@ -234,22 +192,6 @@
             <!-- Chat history list -->
             <div id="chatHistory" class="flex-1 overflow-y-auto p-2">
                 <!-- Chat history items will be added here -->
-            </div>
-            
-            <!-- API Mode Selector -->
-            <div class="p-3 border-t border-gray-700">
-                <div class="api-mode-selector">
-                    <span class="api-mode-label">Режим API:</span>
-                    <div class="api-mode-toggle">
-                        <div class="api-mode-option active" data-mode="direct">Прямой</div>
-                        <div class="api-mode-option" data-mode="proxy">Прокси</div>
-                    </div>
-                </div>
-                
-                <!-- Proxy Server URL Input -->
-                <div id="proxySettings" class="mt-2 hidden">
-                    <input type="text" id="proxyServerUrl" class="w-full p-2 text-xs bg-gray-800 border border-gray-700 rounded-md" placeholder="URL прокси-сервера" value="http://localhost:3000/proxy-to-groq">
-                </div>
             </div>
             
             <!-- User profile -->
@@ -280,79 +222,7 @@
             <div id="chatContainer" class="chat-container p-4 overflow-y-auto flex-1">
                 <!-- Welcome message -->
                 <div class="flex py-4 bot-message">
-                    <div class="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center text-white mr-4">
-                    <i class="fas fa-robot"></i>
-                </div>
-                <div class="flex-1">
-                    <div class="message-content">
-                        <p>👋 Чем могу помочь?</p>
-                    </div>
-                </div>
-            `;
-                chatContainer.appendChild(welcomeDiv);
-                return;
-            }
-            
-            // Load conversation messages
-            for (let i = 0; i < conv.messages.length; i++) {
-                const msg = conv.messages[i];
-                addMessage(msg.content, msg.role === 'user' ? 'user' : 'bot');
-            }
-        }
-
-        // Function to process code blocks in markdown
-        function processCodeBlocks(text) {
-            // Replace code blocks with proper HTML
-            text = text.replace(/```(\w+)?\n([\s\S]*?)```/g, function(match, language, code) {
-                const lang = language || '';
-                return `<pre class="relative"><code class="${lang}">${escapeHtml(code)}</code></pre>`;
-            });
-            
-            // Replace single-line code with inline code
-            text = text.replace(/`([^`]+)`/g, '<code class="bg-gray-100 dark:bg-gray-800 px-1 py-0.5 rounded">$1</code>');
-            
-            // Convert links
-            text = text.replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank" class="text-blue-600 hover:underline">$1</a>');
-            
-            // Convert newlines to <br>
-            text = text.replace(/\n/g, '<br>');
-            
-            return text;
-        }
-
-        // Function to escape HTML
-        function escapeHtml(text) {
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
-        }
-
-        // Function to add copy buttons to code blocks
-        function addCopyButtonsToCodeBlocks() {
-            document.querySelectorAll('pre').forEach(block => {
-                // Check if button already exists
-                if (block.querySelector('.copy-btn')) return;
-                
-                const button = document.createElement('button');
-                button.className = 'copy-btn';
-                button.textContent = 'Copy';
-                
-                button.addEventListener('click', function() {
-                    const code = block.querySelector('code').textContent;
-                    navigator.clipboard.writeText(code).then(() => {
-                        button.textContent = 'Copied!';
-                        setTimeout(() => {
-                            button.textContent = 'Copy';
-                        }, 2000);
-                    });
-                });
-                
-                block.appendChild(button);
-            });
-        }
-    </script>
-</body>
-</html>rounded-full flex items-center justify-center text-white mr-4">
+                    <div class="w-8 h-8 bg-amber-700 rounded-full flex items-center justify-center text-white mr-4">
                         <i class="fas fa-robot"></i>
                     </div>
                     <div class="flex-1">
@@ -371,11 +241,11 @@
                         <textarea 
                             id="messageInput" 
                             rows="1" 
-                            class="w-full border border-gray-300 rounded-lg p-3 pr-10 focus:outline-none focus:border-blue-500 resize-none"
+                            class="w-full border border-gray-300 rounded-lg p-3 pr-10 focus:outline-none focus:border-amber-500 resize-none"
                             placeholder="Введите сообщение..."
                             required
                         ></textarea>
-                        <button type="submit" class="absolute right-2 bottom-2.5 text-gray-400 hover:text-gray-600">
+                        <button type="submit" class="absolute right-2 bottom-2.5 text-gray-400 hover:text-amber-700">
                             <i class="fas fa-paper-plane"></i>
                         </button>
                     </div>
@@ -401,17 +271,14 @@
         const overlay = document.getElementById('overlay');
         const newChatBtn = document.getElementById('newChatBtn');
         const chatHistory = document.getElementById('chatHistory');
-        const apiModeOptions = document.querySelectorAll('.api-mode-option');
-        const proxySettings = document.getElementById('proxySettings');
-        const proxyServerUrl = document.getElementById('proxyServerUrl');
 
         // API key for Groq
         const GROQ_API_KEY = "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";
         const MODEL = "llama-3.3-70b-versatile";
         
-        // API Mode (direct or proxy)
-        let apiMode = localStorage.getItem('apiMode') || 'direct';
-        setApiMode(apiMode);
+        // Прокси-сервер
+        const PROXY_SERVER_URL = "http://localhost:3000/proxy-to-groq";
+        const USE_PROXY = false; // Установите в true, чтобы использовать прокси
 
         // Chat history
         let conversations = [];
@@ -442,15 +309,6 @@
         toggleSidebarBtn.addEventListener('click', toggleSidebar);
         overlay.addEventListener('click', closeSidebar);
         newChatBtn.addEventListener('click', createNewChat);
-        
-        // API Mode Selector
-        apiModeOptions.forEach(option => {
-            option.addEventListener('click', function() {
-                apiModeOptions.forEach(opt => opt.classList.remove('active'));
-                this.classList.add('active');
-                setApiMode(this.dataset.mode);
-            });
-        });
 
         // Auto-resize textarea
         messageInput.addEventListener('input', function() {
@@ -470,28 +328,6 @@
         if (localStorage.getItem('darkMode') === 'true') {
             document.body.classList.add('dark-mode');
             darkModeToggle.innerHTML = '<i class="fas fa-sun"></i>';
-        }
-
-        // Function to set API mode
-        function setApiMode(mode) {
-            apiMode = mode;
-            localStorage.setItem('apiMode', mode);
-            
-            // Update UI
-            apiModeOptions.forEach(opt => {
-                if (opt.dataset.mode === mode) {
-                    opt.classList.add('active');
-                } else {
-                    opt.classList.remove('active');
-                }
-            });
-            
-            // Show/hide proxy settings
-            if (mode === 'proxy') {
-                proxySettings.classList.remove('hidden');
-            } else {
-                proxySettings.classList.add('hidden');
-            }
         }
 
         // Function to generate a unique ID
@@ -595,41 +431,76 @@
                 max_tokens: 4000
             };
 
-            let response;
-            
-            if (apiMode === 'direct') {
-                // Direct API call to Groq
-                response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${GROQ_API_KEY}`
-                    },
-                    body: JSON.stringify(requestData)
-                });
-            } else {
-                // Proxy mode
-                const proxyUrl = proxyServerUrl.value.trim() || 'http://localhost:3000/proxy-to-groq';
+            try {
+                let response;
                 
-                response = await fetch(proxyUrl, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        apiKey: GROQ_API_KEY,
-                        ...requestData
-                    })
-                });
+                if (!USE_PROXY) {
+                    // Direct API call to Groq
+                    response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${GROQ_API_KEY}`
+                        },
+                        body: JSON.stringify(requestData)
+                    });
+                } else {
+                    // Proxy mode
+                    response = await fetch(PROXY_SERVER_URL, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            apiKey: GROQ_API_KEY,
+                            ...requestData
+                        })
+                    });
+                }
+    
+                if (!response.ok) {
+                    console.error('API Error:', response.status, response.statusText);
+                    let errorMessage = 'API request failed';
+                    try {
+                        const errorData = await response.json();
+                        console.error('Error details:', errorData);
+                        errorMessage = errorData.error || errorMessage;
+                    } catch (e) {
+                        console.error('Could not parse error response:', e);
+                    }
+                    throw new Error(errorMessage);
+                }
+    
+                const data = await response.json();
+                return data.choices[0].message.content;
+            } catch (error) {
+                console.error('Error in sendMessageToGroq:', error);
+                
+                // Если первая попытка не удалась и режим прокси включен,
+                // попробуем без прокси
+                if (USE_PROXY) {
+                    console.log('Retrying without proxy...');
+                    try {
+                        const directResponse = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${GROQ_API_KEY}`
+                            },
+                            body: JSON.stringify(requestData)
+                        });
+                        
+                        if (directResponse.ok) {
+                            const data = await directResponse.json();
+                            return data.choices[0].message.content;
+                        }
+                    } catch (retryError) {
+                        console.error('Retry without proxy also failed:', retryError);
+                    }
+                }
+                
+                throw error;
             }
-
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.error || 'API request failed');
-            }
-
-            const data = await response.json();
-            return data.choices[0].message.content;
         }
 
         // Function to add message to UI
@@ -638,7 +509,7 @@
             messageDiv.className = `flex py-4 ${role === 'user' ? 'user-message' : 'bot-message'}`;
             
             const iconDiv = document.createElement('div');
-            iconDiv.className = `w-8 h-8 ${role === 'user' ? 'bg-blue-500' : 'bg-green-500'} rounded-full flex items-center justify-center text-white mr-4`;
+            iconDiv.className = `w-8 h-8 ${role === 'user' ? 'bg-blue-500' : 'bg-amber-700'} rounded-full flex items-center justify-center text-white mr-4`;
             
             const icon = document.createElement('i');
             icon.className = role === 'user' ? 'fas fa-user' : 'fas fa-robot';
@@ -673,7 +544,7 @@
             typingDiv.className = 'flex py-4 bot-message';
             
             const iconDiv = document.createElement('div');
-            iconDiv.className = 'w-8 h-8 bg-green-500 rounded-full flex items-center justify-center text-white mr-4';
+            iconDiv.className = 'w-8 h-8 bg-amber-700 rounded-full flex items-center justify-center text-white mr-4';
             
             const icon = document.createElement('i');
             icon.className = 'fas fa-robot';
@@ -762,7 +633,7 @@
             const welcomeDiv = document.createElement('div');
             welcomeDiv.className = 'flex py-4 bot-message';
             welcomeDiv.innerHTML = `
-                <div class="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center text-white mr-4">
+                <div class="w-8 h-8 bg-amber-700 rounded-full flex items-center justify-center text-white mr-4">
                     <i class="fas fa-robot"></i>
                 </div>
                 <div class="flex-1">
@@ -831,4 +702,76 @@
                 const welcomeDiv = document.createElement('div');
                 welcomeDiv.className = 'flex py-4 bot-message';
                 welcomeDiv.innerHTML = `
-                    <div class="w-8 h-8 bg-green-500
+                    <div class="w-8 h-8 bg-amber-700 rounded-full flex items-center justify-center text-white mr-4">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <div class="flex-1">
+                        <div class="message-content">
+                            <p>👋 Чем могу помочь?</p>
+                        </div>
+                    </div>
+                `;
+                chatContainer.appendChild(welcomeDiv);
+                return;
+            }
+            
+            // Load conversation messages
+            for (let i = 0; i < conv.messages.length; i++) {
+                const msg = conv.messages[i];
+                addMessage(msg.content, msg.role === 'user' ? 'user' : 'bot');
+            }
+        }
+
+        // Function to process code blocks in markdown
+        function processCodeBlocks(text) {
+            // Replace code blocks with proper HTML
+            text = text.replace(/```(\w+)?\n([\s\S]*?)```/g, function(match, language, code) {
+                const lang = language || '';
+                return `<pre class="relative"><code class="${lang}">${escapeHtml(code)}</code></pre>`;
+            });
+            
+            // Replace single-line code with inline code
+            text = text.replace(/`([^`]+)`/g, '<code class="bg-gray-100 dark:bg-gray-800 px-1 py-0.5 rounded">$1</code>');
+            
+            // Convert links
+            text = text.replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank" class="text-amber-700 hover:underline">$1</a>');
+            
+            // Convert newlines to <br>
+            text = text.replace(/\n/g, '<br>');
+            
+            return text;
+        }
+
+        // Function to escape HTML
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Function to add copy buttons to code blocks
+        function addCopyButtonsToCodeBlocks() {
+            document.querySelectorAll('pre').forEach(block => {
+                // Check if button already exists
+                if (block.querySelector('.copy-btn')) return;
+                
+                const button = document.createElement('button');
+                button.className = 'copy-btn';
+                button.textContent = 'Copy';
+                
+                button.addEventListener('click', function() {
+                    const code = block.querySelector('code').textContent;
+                    navigator.clipboard.writeText(code).then(() => {
+                        button.textContent = 'Copied!';
+                        setTimeout(() => {
+                            button.textContent = 'Copy';
+                        }, 2000);
+                    });
+                });
+                
+                block.appendChild(button);
+            });
+        }
+    </script>
+</body>
+</html>
