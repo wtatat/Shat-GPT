@@ -388,8 +388,21 @@
                 console.error('Error:', error);
                 // Remove typing indicator
                 removeTypingIndicator(typingIndicatorId);
-                // Show error message
-                addErrorMessage('Произошла ошибка при получении ответа. Пожалуйста, попробуйте еще раз.');
+                // Show detailed error message
+                let errorMessage = 'Произошла ошибка при получении ответа. ';
+                
+                if (error.message.includes('Failed to fetch') || 
+                    error.message.includes('NetworkError') || 
+                    error.message.includes('Network request failed')) {
+                    errorMessage += 'Проблема с сетевым подключением. ';
+                } else if (error.message.includes('API key')) {
+                    errorMessage += 'Проблема с API ключом. ';
+                } else if (error.message.includes('429')) {
+                    errorMessage += 'Слишком много запросов, подождите немного. ';
+                }
+                
+                errorMessage += 'Пожалуйста, попробуйте еще раз.';
+                addErrorMessage(errorMessage);
             }
         }
 
@@ -509,11 +522,23 @@
             messageDiv.className = `flex py-4 ${role === 'user' ? 'user-message' : 'bot-message'}`;
             
             const iconDiv = document.createElement('div');
-            iconDiv.className = `w-8 h-8 ${role === 'user' ? 'bg-blue-500' : 'bg-amber-700'} rounded-full flex items-center justify-center text-white mr-4`;
             
-            const icon = document.createElement('i');
-            icon.className = role === 'user' ? 'fas fa-user' : 'fas fa-robot';
-            iconDiv.appendChild(icon);
+            if (role === 'user') {
+                iconDiv.className = 'w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white mr-4';
+                const icon = document.createElement('i');
+                icon.className = 'fas fa-user';
+                iconDiv.appendChild(icon);
+            } else {
+                // Используем изображение вместо иконки для бота
+                iconDiv.className = 'w-8 h-8 rounded-full mr-4 overflow-hidden flex-shrink-0';
+                iconDiv.style.background = '#5d4037'; // Фоновый цвет на случай, если изображение не загрузится
+                
+                const img = document.createElement('img');
+                img.src = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MDAgNTAwIj48cGF0aCBmaWxsPSIjNWQ0MDM3IiBkPSJNMjQ5LjksNDkuOGMtMTE2LDAtMjEwLDk0LTIxMCwyMTBzOTQsMjEwLDIxMCwyMTBzMjEwLTk0LDIxMC0yMTBTMzY1LjksNDkuOCwyNDkuOSw0OS44eiBNMzM5LjQsMTM0LjQgICBjMjQuNywyNC43LDI0LjcsNjQuOCwwLDg5LjVsLTI1LjQsMjUuNGMtNS40LDUuNC0xNC4yLDUuNC0xOS42LDBsLTQ1LjEtNDUuMWwtNDUuMSw0NS4xYy01LjQsNS40LTE0LjIsNS40LTE5LjYsMEwxNTksMjIzLjggICBjLTI0LjctMjQuNy0yNC43LTY0LjgsMC04OS41bDQ1LjEtNDUuMWM4LjYtOC42LDIwLTEzLjQsMzIuMS0xMy40YzYuMiwwLDEyLjMsMS4zLDE4LDMuN2M1LjYtMi41LDExLjgtMy43LDE4LTMuNyAgIGMxMi4xLDAsMjMuNSw0LjcsMzIuMSwxMy40TDMzOS40LDEzNC40eiBNMzg5LjEsMzA3LjZjLTI0LjcsMjQuNy02NC44LDI0LjctODkuNSwwbC00NS4xLTQ1LjFsLTQ1LjEsNDUuMSAgIGMtMjQuNywyNC43LTY0LjgsMjQuNy04OS41LDBsMCwwYy0yNC43LTI0LjctMjQuNy02NC44LDAtODkuNWw0NS4xLTQ1LjFjNS40LTUuNCwxNC4yLTUuNCwxOS42LDBsNDUuMSw0NS4xbDQ1LjEtNDUuMSAgIGM1LjQtNS40LDE0LjItNS40LDE5LjYsMGw0NS4xLDQ1LjFDNDEzLjgsMjQyLjgsNDEzLjgsMjgyLjksMzg5LjEsMzA3LjZ6Ii8+PHBhdGggZmlsbD0iIzVkNDAzNyIgZD0iTTI2My40LDI3OC4zYzAsMCwyOS41LDYuOSw0My41LDIyLjZjMCwwLDE1LjMtMTguNSwxOS4zLTM3LjNjMCwwLTI2LjYtMTEuMS01OS4zLTExLjEgICBjLTMyLjgsMC01OS4zLDExLjEtNTkuMywxMS4xYzQsMTguOCwxOS4zLDM3LjMsMTkuMywzNy4zQzI0MSwyODMuNCwyNjEuNywyNzguMywyNjMuNCwyNzguM3oiLz48L3N2Zz4=';
+                img.alt = 'Bot';
+                img.className = 'w-full h-full object-cover';
+                iconDiv.appendChild(img);
+            }
             
             const contentDiv = document.createElement('div');
             contentDiv.className = 'flex-1';
@@ -544,11 +569,14 @@
             typingDiv.className = 'flex py-4 bot-message';
             
             const iconDiv = document.createElement('div');
-            iconDiv.className = 'w-8 h-8 bg-amber-700 rounded-full flex items-center justify-center text-white mr-4';
+            iconDiv.className = 'w-8 h-8 rounded-full mr-4 overflow-hidden flex-shrink-0';
+            iconDiv.style.background = '#5d4037';
             
-            const icon = document.createElement('i');
-            icon.className = 'fas fa-robot';
-            iconDiv.appendChild(icon);
+            const img = document.createElement('img');
+            img.src = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MDAgNTAwIj48cGF0aCBmaWxsPSIjNWQ0MDM3IiBkPSJNMjQ5LjksNDkuOGMtMTE2LDAtMjEwLDk0LTIxMCwyMTBzOTQsMjEwLDIxMCwyMTBzMjEwLTk0LDIxMC0yMTBTMzY1LjksNDkuOCwyNDkuOSw0OS44eiBNMzM5LjQsMTM0LjQgICBjMjQuNywyNC43LDI0LjcsNjQuOCwwLDg5LjVsLTI1LjQsMjUuNGMtNS40LDUuNC0xNC4yLDUuNC0xOS42LDBsLTQ1LjEtNDUuMWwtNDUuMSw0NS4xYy01LjQsNS40LTE0LjIsNS40LTE5LjYsMEwxNTksMjIzLjggICBjLTI0LjctMjQuNy0yNC43LTY0LjgsMC04OS41bDQ1LjEtNDUuMWM4LjYtOC42LDIwLTEzLjQsMzIuMS0xMy40YzYuMiwwLDEyLjMsMS4zLDE4LDMuN2M1LjYtMi41LDExLjgtMy43LDE4LTMuNyAgIGMxMi4xLDAsMjMuNSw0LjcsMzIuMSwxMy40TDMzOS40LDEzNC40eiBNMzg5LjEsMzA3LjZjLTI0LjcsMjQuNy02NC44LDI0LjctODkuNSwwbC00NS4xLTQ1LjFsLTQ1LjEsNDUuMSAgIGMtMjQuNywyNC43LTY0LjgsMjQuNy04OS41LDBsMCwwYy0yNC43LTI0LjctMjQuNy02NC44LDAtODkuNWw0NS4xLTQ1LjFjNS40LTUuNCwxNC4yLTUuNCwxOS42LDBsNDUuMSw0NS4xbDQ1LjEtNDUuMSAgIGM1LjQtNS40LDE0LjItNS40LDE5LjYsMGw0NS4xLDQ1LjFDNDEzLjgsMjQyLjgsNDEzLjgsMjgyLjksMzg5LjEsMzA3LjZ6Ii8+PHBhdGggZmlsbD0iIzVkNDAzNyIgZD0iTTI2My40LDI3OC4zYzAsMCwyOS41LDYuOSw0My41LDIyLjZjMCwwLDE1LjMtMTguNSwxOS4zLTM3LjNjMCwwLTI2LjYtMTEuMS01OS4zLTExLjEgICBjLTMyLjgsMC01OS4zLDExLjEtNTkuMywxMS4xYzQsMTguOCwxOS4zLDM3LjMsMTkuMywzNy4zQzI0MSwyODMuNCwyNjEuNywyNzguMywyNjMuNCwyNzguM3oiLz48L3N2Zz4=';
+            img.alt = 'Bot';
+            img.className = 'w-full h-full object-cover';
+            iconDiv.appendChild(img);
             
             const contentDiv = document.createElement('div');
             contentDiv.className = 'flex-1';
@@ -633,8 +661,8 @@
             const welcomeDiv = document.createElement('div');
             welcomeDiv.className = 'flex py-4 bot-message';
             welcomeDiv.innerHTML = `
-                <div class="w-8 h-8 bg-amber-700 rounded-full flex items-center justify-center text-white mr-4">
-                    <i class="fas fa-robot"></i>
+                <div class="w-8 h-8 rounded-full mr-4 overflow-hidden flex-shrink-0" style="background: #5d4037;">
+                    <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MDAgNTAwIj48cGF0aCBmaWxsPSIjNWQ0MDM3IiBkPSJNMjQ5LjksNDkuOGMtMTE2LDAtMjEwLDk0LTIxMCwyMTBzOTQsMjEwLDIxMCwyMTBzMjEwLTk0LDIxMC0yMTBTMzY1LjksNDkuOCwyNDkuOSw0OS44eiBNMzM5LjQsMTM0LjQgICBjMjQuNywyNC43LDI0LjcsNjQuOCwwLDg5LjVsLTI1LjQsMjUuNGMtNS40LDUuNC0xNC4yLDUuNC0xOS42LDBsLTQ1LjEtNDUuMWwtNDUuMSw0NS4xYy01LjQsNS40LTE0LjIsNS40LTE5LjYsMEwxNTksMjIzLjggICBjLTI0LjctMjQuNy0yNC43LTY0LjgsMC04OS41bDQ1LjEtNDUuMWM4LjYtOC42LDIwLTEzLjQsMzIuMS0xMy40YzYuMiwwLDEyLjMsMS4zLDE4LDMuN2M1LjYtMi41LDExLjgtMy43LDE4LTMuNyAgIGMxMi4xLDAsMjMuNSw0LjcsMzIuMSwxMy40TDMzOS40LDEzNC40eiBNMzg5LjEsMzA3LjZjLTI0LjcsMjQuNy02NC44LDI0LjctODkuNSwwbC00NS4xLTQ1LjFsLTQ1LjEsNDUuMSAgIGMtMjQuNywyNC43LTY0LjgsMjQuNy04OS41LDBsMCwwYy0yNC43LTI0LjctMjQuNy02NC44LDAtODkuNWw0NS4xLTQ1LjFjNS40LTUuNCwxNC4yLTUuNCwxOS42LDBsNDUuMSw0NS4xbDQ1LjEtNDUuMSAgIGM1LjQtNS40LDE0LjItNS40LDE5LjYsMGw0NS4xLDQ1LjFDNDEzLjgsMjQyLjgsNDEzLjgsMjgyLjksMzg5LjEsMzA3LjZ6Ii8+PHBhdGggZmlsbD0iIzVkNDAzNyIgZD0iTTI2My40LDI3OC4zYzAsMCwyOS41LDYuOSw0My41LDIyLjZjMCwwLDE1LjMtMTguNSwxOS4zLTM3LjNjMCwwLTI2LjYtMTEuMS01OS4zLTExLjEgICBjLTMyLjgsMC01OS4zLDExLjEtNTkuMywxMS4xYzQsMTguOCwxOS4zLDM3LjMsMTkuMywzNy4zQzI0MSwyODMuNCwyNjEuNywyNzguMywyNjMuNCwyNzguM3oiLz48L3N2Zz4=" alt="Bot" class="w-full h-full object-cover">
                 </div>
                 <div class="flex-1">
                     <div class="message-content">
@@ -702,8 +730,8 @@
                 const welcomeDiv = document.createElement('div');
                 welcomeDiv.className = 'flex py-4 bot-message';
                 welcomeDiv.innerHTML = `
-                    <div class="w-8 h-8 bg-amber-700 rounded-full flex items-center justify-center text-white mr-4">
-                        <i class="fas fa-robot"></i>
+                    <div class="w-8 h-8 rounded-full mr-4 overflow-hidden flex-shrink-0" style="background: #5d4037;">
+                        <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MDAgNTAwIj48cGF0aCBmaWxsPSIjNWQ0MDM3IiBkPSJNMjQ5LjksNDkuOGMtMTE2LDAtMjEwLDk0LTIxMCwyMTBzOTQsMjEwLDIxMCwyMTBzMjEwLTk0LDIxMC0yMTBTMzY1LjksNDkuOCwyNDkuOSw0OS44eiBNMzM5LjQsMTM0LjQgICBjMjQuNywyNC43LDI0LjcsNjQuOCwwLDg5LjVsLTI1LjQsMjUuNGMtNS40LDUuNC0xNC4yLDUuNC0xOS42LDBsLTQ1LjEtNDUuMWwtNDUuMSw0NS4xYy01LjQsNS40LTE0LjIsNS40LTE5LjYsMEwxNTksMjIzLjggICBjLTI0LjctMjQuNy0yNC43LTY0LjgsMC04OS41bDQ1LjEtNDUuMWM4LjYtOC42LDIwLTEzLjQsMzIuMS0xMy40YzYuMiwwLDEyLjMsMS4zLDE4LDMuN2M1LjYtMi41LDExLjgtMy43LDE4LTMuNyAgIGMxMi4xLDAsMjMuNSw0LjcsMzIuMSwxMy40TDMzOS40LDEzNC40eiBNMzg5LjEsMzA3LjZjLTI0LjcsMjQuNy02NC44LDI0LjctODkuNSwwbC00NS4xLTQ1LjFsLTQ1LjEsNDUuMSAgIGMtMjQuNywyNC43LTY0LjgsMjQuNy04OS41LDBsMCwwYy0yNC43LTI0LjctMjQuNy02NC44LDAtODkuNWw0NS4xLTQ1LjFjNS40LTUuNCwxNC4yLTUuNCwxOS42LDBsNDUuMSw0NS4xbDQ1LjEtNDUuMSAgIGM1LjQtNS40LDE0LjItNS40LDE5LjYsMGw0NS4xLDQ1LjFDNDEzLjgsMjQyLjgsNDEzLjgsMjgyLjksMzg5LjEsMzA3LjZ6Ii8+PHBhdGggZmlsbD0iIzVkNDAzNyIgZD0iTTI2My40LDI3OC4zYzAsMCwyOS41LDYuOSw0My41LDIyLjZjMCwwLDE1LjMtMTguNSwxOS4zLTM3LjNjMCwwLTI2LjYtMTEuMS01OS4zLTExLjEgICBjLTMyLjgsMC01OS4zLDExLjEtNTkuMywxMS4xYzQsMTguOCwxOS4zLDM3LjMsMTkuMywzNy4zQzI0MSwyODMuNCwyNjEuNywyNzguMywyNjMuNCwyNzguM3oiLz48L3N2Zz4=" alt="Bot" class="w-full h-full object-cover">
                     </div>
                     <div class="flex-1">
                         <div class="message-content">
