@@ -3,819 +3,868 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chat Interface</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <title>SlonGPT - Российский ИИ-ассистент</title>
     <style>
+        :root {
+            --bg-primary: #f5f5f5;
+            --bg-secondary: #ffffff;
+            --bg-tertiary: #e9e9e9;
+            --text-primary: #1a1a1a;
+            --text-secondary: #666666;
+            --border-color: #e0e0e0;
+            --accent-color: #4a90e2;
+            --hover-bg: #f0f0f0;
+            --shadow: 0 2px 10px rgba(0,0,0,0.1);
+            --message-user: #e3f2fd;
+            --message-assistant: #f5f5f5;
+        }
+
+        [data-theme="dark"] {
+            --bg-primary: #1a1a1a;
+            --bg-secondary: #2d2d2d;
+            --bg-tertiary: #3a3a3a;
+            --text-primary: #ffffff;
+            --text-secondary: #b0b0b0;
+            --border-color: #404040;
+            --accent-color: #64b5f6;
+            --hover-bg: #3a3a3a;
+            --shadow: 0 2px 10px rgba(0,0,0,0.5);
+            --message-user: #1e3a5f;
+            --message-assistant: #2d2d2d;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-        }
-        
-        .chat-container {
-            height: calc(100vh - 180px);
-            overflow-y: auto;
-        }
-        
-        .user-message {
-            background-color: #ffffff;
-        }
-        
-        .bot-message {
-            background-color: #f7f5f2;
-        }
-        
-        .message-content {
-            white-space: pre-wrap;
-            word-wrap: break-word;
-        }
-        
-        .typing-animation::after {
-            content: '...';
-            animation: typing 1.5s infinite;
-        }
-        
-        @keyframes typing {
-            0% { content: '.'; }
-            33% { content: '..'; }
-            66% { content: '...'; }
-            100% { content: '.'; }
-        }
-        
-        /* Custom scrollbar */
-        ::-webkit-scrollbar {
-            width: 7px;
-        }
-        
-        ::-webkit-scrollbar-track {
-            background: #f1f1f1;
-        }
-        
-        ::-webkit-scrollbar-thumb {
-            background: #c1c1c1;
-            border-radius: 10px;
-        }
-        
-        ::-webkit-scrollbar-thumb:hover {
-            background: #a1a1a1;
-        }
-        
-        /* Mobile responsiveness */
-        @media (max-width: 640px) {
-            .chat-container {
-                height: calc(100vh - 160px);
-            }
-        }
-        
-        /* Dark mode toggle */
-        .dark-mode {
-            background-color: #2d2520;
-            color: #f8f0e8;
-        }
-        
-        .dark-mode .user-message {
-            background-color: #2d2520;
-        }
-        
-        .dark-mode .bot-message {
-            background-color: #3d322c;
-        }
-        
-        .dark-mode .border-gray-200 {
-            border-color: #5a4a40;
-        }
-        
-        .dark-mode .bg-white {
-            background-color: #2d2520;
-        }
-        
-        .dark-mode .text-gray-700 {
-            color: #f8f0e8;
-        }
-        
-        .dark-mode .bg-gray-50 {
-            background-color: #3d322c;
-        }
-        
-        .dark-mode ::-webkit-scrollbar-track {
-            background: #2d2520;
-        }
-        
-        .dark-mode ::-webkit-scrollbar-thumb {
-            background: #5a4a40;
-        }
-        
-        .dark-mode ::-webkit-scrollbar-thumb:hover {
-            background: #6a584c;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            height: 100vh;
+            overflow: hidden;
+            transition: background-color 0.3s, color 0.3s;
         }
 
-        /* Code blocks styling */
-        pre {
-            background-color: rgba(120, 83, 58, 0.1);
-            border-radius: 6px;
+        .app-container {
+            display: flex;
+            height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 260px;
+            background-color: var(--bg-secondary);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.3s;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .new-chat-btn {
+            width: 100%;
             padding: 12px;
-            overflow-x: auto;
-            margin: 8px 0;
-        }
-
-        .dark-mode pre {
-            background-color: rgba(120, 83, 58, 0.3);
-        }
-
-        /* Copy button */
-        .copy-btn {
-            position: absolute;
-            top: 8px;
-            right: 8px;
-            padding: 4px 8px;
-            border-radius: 4px;
-            background-color: rgba(120, 83, 58, 0.2);
-            color: #78533a;
-            font-size: 12px;
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
             cursor: pointer;
-            transition: all 0.2s;
+            font-size: 14px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: background-color 0.2s;
         }
 
-        .copy-btn:hover {
-            background-color: rgba(120, 83, 58, 0.3);
+        .new-chat-btn:hover {
+            background-color: #3a7abd;
         }
 
-        .dark-mode .copy-btn {
-            background-color: rgba(120, 83, 58, 0.4);
-            color: #d1baa9;
+        .chat-list {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 10px;
         }
 
-        .dark-mode .copy-btn:hover {
-            background-color: rgba(120, 83, 58, 0.6);
+        .chat-item {
+            padding: 12px;
+            margin-bottom: 5px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s;
         }
 
-        /* Side panel */
-        .side-panel {
-            transition: all 0.3s ease;
+        .chat-item:hover {
+            background-color: var(--hover-bg);
         }
 
-        @media (max-width: 768px) {
-            .side-panel {
-                transform: translateX(-100%);
-                position: absolute;
-                z-index: 10;
-                height: 100vh;
+        .chat-item.active {
+            background-color: var(--bg-tertiary);
+        }
+
+        .chat-item-title {
+            font-weight: 500;
+            margin-bottom: 4px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .chat-item-date {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        /* Main content */
+        .main-content {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            background-color: var(--bg-primary);
+        }
+
+        .header {
+            height: 60px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            background-color: var(--bg-secondary);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--text-primary);
+        }
+
+        .app-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--accent-color);
+        }
+
+        .theme-toggle {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--text-primary);
+            padding: 8px;
+            border-radius: 8px;
+            transition: background-color 0.2s;
+        }
+
+        .theme-toggle:hover {
+            background-color: var(--hover-bg);
+        }
+
+        /* Chat area */
+        .chat-container {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .chat-messages {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .message {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 12px;
+        }
+
+        .message-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+
+        .message.user .message-avatar {
+            background-color: var(--accent-color);
+            color: white;
+        }
+
+        .message.assistant .message-avatar {
+            background-color: var(--bg-tertiary);
+            color: var(--text-primary);
+        }
+
+        .message-content {
+            flex-grow: 1;
+        }
+
+        .message-role {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+        }
+
+        .message-text {
+            line-height: 1.6;
+            white-space: pre-wrap;
+        }
+
+        .message-image {
+            max-width: 100%;
+            margin-top: 10px;
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+        }
+
+        /* Input area */
+        .input-container {
+            border-top: 1px solid var(--border-color);
+            background-color: var(--bg-secondary);
+            padding: 20px;
+        }
+
+        .input-wrapper {
+            max-width: 800px;
+            margin: 0 auto;
+            display: flex;
+            gap: 10px;
+            align-items: flex-end;
+        }
+
+        .input-box {
+            flex-grow: 1;
+            background-color: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .attach-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--text-secondary);
+            padding: 8px;
+            border-radius: 50%;
+            transition: background-color 0.2s, color 0.2s;
+        }
+
+        .attach-btn:hover {
+            background-color: var(--hover-bg);
+            color: var(--text-primary);
+        }
+
+        .message-input {
+            flex-grow: 1;
+            border: none;
+            background: none;
+            outline: none;
+            font-size: 16px;
+            color: var(--text-primary);
+            resize: none;
+            max-height: 200px;
+            font-family: inherit;
+        }
+
+        .send-btn {
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.2s;
+        }
+
+        .send-btn:hover {
+            background-color: #3a7abd;
+        }
+
+        .send-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Welcome screen */
+        .welcome-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .welcome-title {
+            font-size: 48px;
+            font-weight: 700;
+            color: var(--accent-color);
+            margin-bottom: 20px;
+        }
+
+        .welcome-subtitle {
+            font-size: 18px;
+            color: var(--text-secondary);
+            margin-bottom: 40px;
+        }
+
+        .welcome-features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            max-width: 600px;
+            width: 100%;
+        }
+
+        .feature-card {
+            background-color: var(--bg-secondary);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+        }
+
+        .feature-icon {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .feature-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .feature-desc {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        /* Loading animation */
+        .loading {
+            display: inline-flex;
+            gap: 4px;
+        }
+
+        .loading span {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: var(--text-secondary);
+            animation: loading 1.4s infinite;
+        }
+
+        .loading span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .loading span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes loading {
+            0%, 60%, 100% {
+                opacity: 0.3;
             }
-            
-            .side-panel.open {
+            30% {
+                opacity: 1;
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                position: fixed;
+                left: 0;
+                top: 0;
+                bottom: 0;
+                z-index: 1000;
+                transform: translateX(-100%);
+            }
+
+            .sidebar.active {
                 transform: translateX(0);
             }
-            
-            .overlay {
-                position: fixed;
-                top: 0;
-                left: 0;
-                right: 0;
-                bottom: 0;
-                background-color: rgba(0, 0, 0, 0.5);
-                z-index: 5;
+
+            .menu-toggle {
+                display: block;
             }
+
+            .welcome-features {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* File input styling */
+        .file-input {
+            display: none;
+        }
+
+        .image-preview {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+        }
+
+        .preview-item {
+            position: relative;
+            width: 80px;
+            height: 80px;
+        }
+
+        .preview-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+
+        .preview-remove {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
         }
     </style>
 </head>
-<body class="bg-white">
-    <div class="flex h-screen">
-        <!-- Side panel (Chat history) -->
-        <div id="sidePanel" class="side-panel bg-gray-900 text-white w-64 flex flex-col">
-            <!-- New chat button -->
-            <div class="p-3 border-b border-gray-700">
-                <button id="newChatBtn" class="flex items-center w-full rounded-md p-3 text-sm font-medium hover:bg-gray-700 transition">
-                    <i class="fas fa-plus mr-2"></i>
-                    New chat
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <button class="new-chat-btn" onclick="startNewChat()">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                        <path d="M8 3V13M3 8H13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                    Новый чат
                 </button>
             </div>
-            
-            <!-- Chat history list -->
-            <div id="chatHistory" class="flex-1 overflow-y-auto p-2">
-                <!-- Chat history items will be added here -->
-            </div>
-            
-            <!-- User profile -->
-            <div class="p-3 border-t border-gray-700">
-                <div class="flex items-center p-2 rounded-md hover:bg-gray-700 cursor-pointer">
-                    <div class="w-8 h-8 bg-gray-500 rounded-full flex items-center justify-center text-white">
-                        <i class="fas fa-user"></i>
-                    </div>
-                    <span class="ml-2 text-sm">User</span>
-                </div>
+            <div class="chat-list" id="chatList">
+                <!-- Chat items will be dynamically added here -->
             </div>
         </div>
-        
+
         <!-- Main content -->
-        <div class="flex-1 flex flex-col overflow-hidden">
-            <!-- Header -->
-            <header class="bg-white border-b border-gray-200 p-4 flex items-center justify-between">
-                <button id="toggleSidebarBtn" class="md:hidden text-gray-700">
-                    <i class="fas fa-bars"></i>
+        <div class="main-content">
+            <div class="header">
+                <div class="header-left">
+                    <button class="menu-toggle" onclick="toggleSidebar()">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                            <path d="M3 12H21M3 6H21M3 18H21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                    </button>
+                    <h1 class="app-title">SlonGPT</h1>
+                </div>
+                <button class="theme-toggle" onclick="toggleTheme()">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                        <path d="M12 3V4M12 20V21M4 12H3M21 12H20M6.34 6.34L5.64 5.64M18.36 18.36L17.66 17.66M6.34 17.66L5.64 18.36M18.36 5.64L17.66 6.34M16 12C16 14.21 14.21 16 12 16C9.79 16 8 14.21 8 12C8 9.79 9.79 8 12 8C14.21 8 16 9.79 16 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
                 </button>
-                <h1 class="text-xl font-semibold text-center flex-1">Chat Interface</h1>
-                <button id="darkModeToggle" class="text-gray-700">
-                    <i class="fas fa-moon"></i>
-                </button>
-            </header>
-            
-            <!-- Chat messages container -->
-            <div id="chatContainer" class="chat-container p-4 overflow-y-auto flex-1">
-                <!-- Welcome message -->
-                <div class="flex py-4 bot-message">
-                    <div class="w-8 h-8 bg-amber-700 rounded-full flex items-center justify-center text-white mr-4">
-                        <i class="fas fa-robot"></i>
-                    </div>
-                    <div class="flex-1">
-                        <div class="message-content">
-                            <p>👋 Чем могу помочь?</p>
+            </div>
+
+            <div class="chat-container" id="chatContainer">
+                <div class="chat-messages" id="chatMessages">
+                    <!-- Welcome screen -->
+                    <div class="welcome-screen" id="welcomeScreen">
+                        <h1 class="welcome-title">SlonGPT</h1>
+                        <p class="welcome-subtitle">Российский ИИ-ассистент нового поколения</p>
+                        <div class="welcome-features">
+                            <div class="feature-card">
+                                <div class="feature-icon">💬</div>
+                                <div class="feature-title">Диалоги</div>
+                                <div class="feature-desc">Общайтесь на любые темы</div>
+                            </div>
+                            <div class="feature-card">
+                                <div class="feature-icon">🎨</div>
+                                <div class="feature-title">Изображения</div>
+                                <div class="feature-desc">Создавайте картинки по описанию</div>
+                            </div>
+                            <div class="feature-card">
+                                <div class="feature-icon">📷</div>
+                                <div class="feature-title">OCR</div>
+                                <div class="feature-desc">Распознавание текста на фото</div>
+                            </div>
                         </div>
                     </div>
                 </div>
-                <!-- Messages will be added here -->
             </div>
-            
-            <!-- Input area -->
-            <div class="border-t border-gray-200 p-4 bg-white">
-                <form id="messageForm" class="flex items-center">
-                    <div class="relative flex-1">
-                        <textarea 
-                            id="messageInput" 
-                            rows="1" 
-                            class="w-full border border-gray-300 rounded-lg p-3 pr-10 focus:outline-none focus:border-amber-500 resize-none"
-                            placeholder="Введите сообщение..."
-                            required
-                        ></textarea>
-                        <button type="submit" class="absolute right-2 bottom-2.5 text-gray-400 hover:text-amber-700">
-                            <i class="fas fa-paper-plane"></i>
-                        </button>
+
+            <div class="input-container">
+                <div class="input-wrapper">
+                    <div style="flex-grow: 1;">
+                        <div class="image-preview" id="imagePreview"></div>
+                        <div class="input-box">
+                            <input type="file" id="fileInput" class="file-input" accept="image/*" multiple onchange="handleFileSelect(event)">
+                            <button class="attach-btn" onclick="document.getElementById('fileInput').click()">
+                                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                                    <path d="M10.975 4.475C10.975 4.475 6.5 8.95 6.5 12C6.5 15.05 8.675 17.525 11.5 17.525C14.325 17.525 16.5 15.35 16.5 12.525C16.5 9.7 14.625 7.525 12.1 7.525C9.575 7.525 7.7 9.4 7.7 11.925C7.7 14.45 9.275 16.325 11.5 16.325C13.725 16.325 15.3 14.75 15.3 12.525" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                                </svg>
+                            </button>
+                            <textarea 
+                                class="message-input" 
+                                id="messageInput" 
+                                placeholder="Введите сообщение..." 
+                                rows="1"
+                                onkeydown="handleKeyDown(event)"
+                                oninput="autoResize(this)"></textarea>
+                        </div>
                     </div>
-                </form>
-                <div class="text-center text-xs text-gray-500 mt-2">
-                    Shat GPT может ошибаться, перепроверяйте важную информацию
+                    <button class="send-btn" id="sendBtn" onclick="sendMessage()">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                            <path d="M3 10L17 3L13 17L10 11L3 10Z" fill="currentColor"/>
+                        </svg>
+                    </button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Overlay for mobile -->
-    <div id="overlay" class="hidden"></div>
-
     <script>
-        // DOM elements
-        const chatContainer = document.getElementById('chatContainer');
-        const messageForm = document.getElementById('messageForm');
-        const messageInput = document.getElementById('messageInput');
-        const darkModeToggle = document.getElementById('darkModeToggle');
-        const sidePanel = document.getElementById('sidePanel');
-        const toggleSidebarBtn = document.getElementById('toggleSidebarBtn');
-        const overlay = document.getElementById('overlay');
-        const newChatBtn = document.getElementById('newChatBtn');
-        const chatHistory = document.getElementById('chatHistory');
+        let currentChatId = null;
+        let attachedImages = [];
+        let isLoading = false;
 
-        // API key for Groq
-        const GROQ_API_KEY = "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";
-        const MODEL = "llama-3.3-70b-versatile";
-        
-        // Прокси-сервер
-        const PROXY_SERVER_URL = "http://localhost:3000/proxy-to-groq";
-        const USE_PROXY = false; // Установите в true, чтобы использовать прокси
+        // Initialize theme
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        document.documentElement.setAttribute('data-theme', savedTheme);
 
-        // Chat history
-        let conversations = [];
-        let currentConversationId = generateId();
-        let currentConversationTitle = "New Chat";
-
-        // Load chats from local storage
+        // Load chats on startup
         loadChats();
 
-        // Initialize the first conversation
-        if (conversations.length === 0) {
-            conversations.push({
-                id: currentConversationId,
-                title: currentConversationTitle,
-                messages: []
+        function toggleTheme() {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+        }
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('active');
+        }
+
+        function autoResize(textarea) {
+            textarea.style.height = 'auto';
+            textarea.style.height = textarea.scrollHeight + 'px';
+        }
+
+        function handleKeyDown(event) {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                sendMessage();
+            }
+        }
+
+        function handleFileSelect(event) {
+            const files = Array.from(event.target.files);
+            
+            files.forEach(file => {
+                if (file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        attachedImages.push(e.target.result);
+                        updateImagePreview();
+                    };
+                    reader.readAsDataURL(file);
+                }
             });
-            saveChats();
-        } else {
-            currentConversationId = conversations[0].id;
-            currentConversationTitle = conversations[0].title;
-            renderChatHistory();
-            loadConversation(currentConversationId);
+            
+            event.target.value = '';
         }
 
-        // Event listeners
-        messageForm.addEventListener('submit', handleSubmit);
-        darkModeToggle.addEventListener('click', toggleDarkMode);
-        toggleSidebarBtn.addEventListener('click', toggleSidebar);
-        overlay.addEventListener('click', closeSidebar);
-        newChatBtn.addEventListener('click', createNewChat);
+        function updateImagePreview() {
+            const preview = document.getElementById('imagePreview');
+            preview.innerHTML = '';
+            
+            attachedImages.forEach((img, index) => {
+                const item = document.createElement('div');
+                item.className = 'preview-item';
+                item.innerHTML = `
+                    <img src="${img}" alt="Preview">
+                    <button class="preview-remove" onclick="removeImage(${index})">×</button>
+                `;
+                preview.appendChild(item);
+            });
+        }
 
-        // Auto-resize textarea
-        messageInput.addEventListener('input', function() {
-            this.style.height = 'auto';
-            this.style.height = (this.scrollHeight < 150 ? this.scrollHeight : 150) + 'px';
-        });
+        function removeImage(index) {
+            attachedImages.splice(index, 1);
+            updateImagePreview();
+        }
 
-        // Handle Enter key for submission (Shift+Enter for new line)
-        messageInput.addEventListener('keydown', function(e) {
-            if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                messageForm.dispatchEvent(new Event('submit'));
+        async function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const message = input.value.trim();
+            
+            if (!message || isLoading) return;
+            
+            isLoading = true;
+            document.getElementById('sendBtn').disabled = true;
+            
+            // Hide welcome screen
+            const welcomeScreen = document.getElementById('welcomeScreen');
+            if (welcomeScreen) {
+                welcomeScreen.remove();
             }
-        });
-
-        // Check for saved dark mode preference
-        if (localStorage.getItem('darkMode') === 'true') {
-            document.body.classList.add('dark-mode');
-            darkModeToggle.innerHTML = '<i class="fas fa-sun"></i>';
-        }
-
-        // Function to generate a unique ID
-        function generateId() {
-            return Date.now().toString(36) + Math.random().toString(36).substr(2);
-        }
-
-        // Function to save chats to localStorage
-        function saveChats() {
-            localStorage.setItem('chatConversations', JSON.stringify(conversations));
-        }
-
-        // Function to load chats from localStorage
-        function loadChats() {
-            const savedChats = localStorage.getItem('chatConversations');
-            if (savedChats) {
-                conversations = JSON.parse(savedChats);
-                renderChatHistory();
-            }
-        }
-
-        // Function to handle form submission
-        async function handleSubmit(e) {
-            e.preventDefault();
-            const message = messageInput.value.trim();
-            if (!message) return;
-
+            
             // Add user message to UI
-            addMessage(message, 'user');
-            messageInput.value = '';
-            messageInput.style.height = 'auto';
+            addMessageToUI('user', message, attachedImages);
             
-            // Add typing indicator
-            const typingIndicatorId = addTypingIndicator();
+            input.value = '';
+            autoResize(input);
+            const imagesToSend = [...attachedImages];
+            attachedImages = [];
+            updateImagePreview();
+            
+            // Add loading message
+            const loadingDiv = addMessageToUI('assistant', '', [], true);
             
             try {
-                const response = await sendMessageToGroq(message);
-                // Remove typing indicator
-                removeTypingIndicator(typingIndicatorId);
-                // Add bot response to UI
-                addMessage(response, 'bot');
-
-                // Update conversation
-                const currentConv = conversations.find(conv => conv.id === currentConversationId);
-                if (currentConv) {
-                    currentConv.messages.push({ role: 'user', content: message });
-                    currentConv.messages.push({ role: 'assistant', content: response });
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        message: message,
+                        chat_id: currentChatId,
+                        images: imagesToSend
+                    })
+                });
+                
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder();
+                let assistantMessage = '';
+                
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
                     
-                    // Update title if it's the first message
-                    if (currentConv.messages.length === 2 && currentConv.title === "New Chat") {
-                        currentConv.title = generateTitle(message);
-                        renderChatHistory();
-                    }
+                    const chunk = decoder.decode(value);
+                    const lines = chunk.split('\n');
                     
-                    saveChats();
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                // Remove typing indicator
-                removeTypingIndicator(typingIndicatorId);
-                // Show detailed error message
-                let errorMessage = 'Произошла ошибка при получении ответа. ';
-                
-                if (error.message.includes('Failed to fetch') || 
-                    error.message.includes('NetworkError') || 
-                    error.message.includes('Network request failed')) {
-                    errorMessage += 'Проблема с сетевым подключением. ';
-                } else if (error.message.includes('API key')) {
-                    errorMessage += 'Проблема с API ключом. ';
-                } else if (error.message.includes('429')) {
-                    errorMessage += 'Слишком много запросов, подождите немного. ';
-                }
-                
-                errorMessage += 'Пожалуйста, попробуйте еще раз.';
-                addErrorMessage(errorMessage);
-            }
-        }
-
-        // Function to generate a title from the first message
-        function generateTitle(message) {
-            // Limit to first 30 characters
-            return message.length > 30 ? message.substring(0, 27) + '...' : message;
-        }
-
-        // Function to send message to Groq API (with proxy support)
-        async function sendMessageToGroq(message) {
-            const currentConv = conversations.find(conv => conv.id === currentConversationId);
-            
-            // Prepare conversation history
-            const messages = [];
-            
-            // Add system message
-            messages.push({
-                role: "system",
-                content: "Ты полезный, креативный и дружелюбный ассистент. Всегда отвечай максимально информативно и точно. Для кода используй форматирование markdown."
-            });
-            
-            // Add conversation history
-            if (currentConv && currentConv.messages.length > 0) {
-                messages.push(...currentConv.messages);
-            }
-            
-            // Add current message
-            messages.push({
-                role: "user",
-                content: message
-            });
-
-            // Prepare API request data
-            const requestData = {
-                model: MODEL,
-                messages: messages,
-                temperature: 0.7,
-                max_tokens: 4000
-            };
-
-            try {
-                let response;
-                
-                if (!USE_PROXY) {
-                    // Direct API call to Groq
-                    response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${GROQ_API_KEY}`
-                        },
-                        body: JSON.stringify(requestData)
-                    });
-                } else {
-                    // Proxy mode
-                    response = await fetch(PROXY_SERVER_URL, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            apiKey: GROQ_API_KEY,
-                            ...requestData
-                        })
-                    });
-                }
-    
-                if (!response.ok) {
-                    console.error('API Error:', response.status, response.statusText);
-                    let errorMessage = 'API request failed';
-                    try {
-                        const errorData = await response.json();
-                        console.error('Error details:', errorData);
-                        errorMessage = errorData.error || errorMessage;
-                    } catch (e) {
-                        console.error('Could not parse error response:', e);
-                    }
-                    throw new Error(errorMessage);
-                }
-    
-                const data = await response.json();
-                return data.choices[0].message.content;
-            } catch (error) {
-                console.error('Error in sendMessageToGroq:', error);
-                
-                // Если первая попытка не удалась и режим прокси включен,
-                // попробуем без прокси
-                if (USE_PROXY) {
-                    console.log('Retrying without proxy...');
-                    try {
-                        const directResponse = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'Authorization': `Bearer ${GROQ_API_KEY}`
-                            },
-                            body: JSON.stringify(requestData)
-                        });
-                        
-                        if (directResponse.ok) {
-                            const data = await directResponse.json();
-                            return data.choices[0].message.content;
+                    for (const line of lines) {
+                        if (line.startsWith('data: ')) {
+                            try {
+                                const data = JSON.parse(line.slice(6));
+                                
+                                if (data.content) {
+                                    assistantMessage += data.content;
+                                    updateMessageContent(loadingDiv, assistantMessage);
+                                }
+                                
+                                if (data.image) {
+                                    const img = document.createElement('img');
+                                    img.src = `data:image/png;base64,${data.image}`;
+                                    img.className = 'message-image';
+                                    loadingDiv.querySelector('.message-text').appendChild(img);
+                                }
+                                
+                                if (data.done) {
+                                    currentChatId = data.chat_id;
+                                    loadChats();
+                                }
+                            } catch (e) {
+                                console.error('Error parsing SSE data:', e);
+                            }
                         }
-                    } catch (retryError) {
-                        console.error('Retry without proxy also failed:', retryError);
                     }
                 }
-                
-                throw error;
+            } catch (error) {
+                console.error('Error sending message:', error);
+                updateMessageContent(loadingDiv, 'Произошла ошибка при отправке сообщения.');
             }
+            
+            isLoading = false;
+            document.getElementById('sendBtn').disabled = false;
         }
 
-        // Function to add message to UI
-        function addMessage(message, role) {
+        function addMessageToUI(role, content, images = [], isLoading = false) {
+            const messagesContainer = document.getElementById('chatMessages');
+            
             const messageDiv = document.createElement('div');
-            messageDiv.className = `flex py-4 ${role === 'user' ? 'user-message' : 'bot-message'}`;
+            messageDiv.className = `message ${role}`;
             
-            const iconDiv = document.createElement('div');
-            
-            if (role === 'user') {
-                iconDiv.className = 'w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white mr-4';
-                const icon = document.createElement('i');
-                icon.className = 'fas fa-user';
-                iconDiv.appendChild(icon);
-            } else {
-                // Используем изображение вместо иконки для бота
-                iconDiv.className = 'w-8 h-8 rounded-full mr-4 overflow-hidden flex-shrink-0';
-                iconDiv.style.background = '#5d4037'; // Фоновый цвет на случай, если изображение не загрузится
-                
-                const img = document.createElement('img');
-                // Обновленная ссылка на иконку (корректную вы можете подставить позже)
-                img.src = 'https://i.postimg.cc/rpP8Jpp7/file-000000000e9861f79665455f8cde01ff.png';
-                img.alt = 'Bot';
-                img.className = 'w-full h-full object-cover';
-                img.onerror = function() {
-                    // Если изображение не загружается, показываем резервную иконку
-                    this.style.display = 'none';
-                    const fallbackIcon = document.createElement('i');
-                    fallbackIcon.className = 'fas fa-robot';
-                    fallbackIcon.style.color = 'white';
-                    iconDiv.appendChild(fallbackIcon);
-                };
-                iconDiv.appendChild(img);
-            }
+            const avatar = document.createElement('div');
+            avatar.className = 'message-avatar';
+            avatar.textContent = role === 'user' ? 'В' : 'S';
             
             const contentDiv = document.createElement('div');
-            contentDiv.className = 'flex-1';
+            contentDiv.className = 'message-content';
             
-            const messageContent = document.createElement('div');
-            messageContent.className = 'message-content';
+            const roleDiv = document.createElement('div');
+            roleDiv.className = 'message-role';
+            roleDiv.textContent = role === 'user' ? 'Вы' : 'SlonGPT';
             
-            // Process markdown code blocks
-            const formattedMessage = processCodeBlocks(message);
-            messageContent.innerHTML = formattedMessage;
+            const textDiv = document.createElement('div');
+            textDiv.className = 'message-text';
             
-            contentDiv.appendChild(messageContent);
-            messageDiv.appendChild(iconDiv);
+            if (isLoading) {
+                textDiv.innerHTML = '<div class="loading"><span></span><span></span><span></span></div>';
+            } else {
+                textDiv.textContent = content;
+            }
+            
+            contentDiv.appendChild(roleDiv);
+            contentDiv.appendChild(textDiv);
+            
+            // Add images if any
+            if (images.length > 0) {
+                images.forEach(img => {
+                    const imgEl = document.createElement('img');
+                    imgEl.src = img;
+                    imgEl.className = 'message-image';
+                    contentDiv.appendChild(imgEl);
+                });
+            }
+            
+            messageDiv.appendChild(avatar);
             messageDiv.appendChild(contentDiv);
             
-            chatContainer.appendChild(messageDiv);
-            chatContainer.scrollTop = chatContainer.scrollHeight;
+            messagesContainer.appendChild(messageDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
             
-            // Add copy buttons to code blocks
-            addCopyButtonsToCodeBlocks();
+            return messageDiv;
         }
 
-        // Function to add typing indicator
-        function addTypingIndicator() {
-            const id = generateId();
-            const typingDiv = document.createElement('div');
-            typingDiv.id = `typing-${id}`;
-            typingDiv.className = 'flex py-4 bot-message';
-            
-            const iconDiv = document.createElement('div');
-            iconDiv.className = 'w-8 h-8 rounded-full mr-4 overflow-hidden flex-shrink-0';
-            iconDiv.style.background = '#5d4037';
-            
-            const img = document.createElement('img');
-            img.src = 'https://i.ibb.co/m5wmPZN/file-000000000e9861f79665455f8cde01ff.png';
-            img.alt = 'Bot';
-            img.className = 'w-full h-full object-cover';
-            img.onerror = function() {
-                // Если изображение не загружается, показываем резервную иконку
-                this.style.display = 'none';
-                const fallbackIcon = document.createElement('i');
-                fallbackIcon.className = 'fas fa-robot';
-                fallbackIcon.style.color = 'white';
-                iconDiv.appendChild(fallbackIcon);
-            };
-            iconDiv.appendChild(img);
-            
-            const contentDiv = document.createElement('div');
-            contentDiv.className = 'flex-1';
-            
-            const typingContent = document.createElement('div');
-            typingContent.className = 'message-content';
-            
-            const typingSpan = document.createElement('span');
-            typingSpan.className = 'typing-animation';
-            typingSpan.textContent = 'Печатает';
-            
-            typingContent.appendChild(typingSpan);
-            contentDiv.appendChild(typingContent);
-            typingDiv.appendChild(iconDiv);
-            typingDiv.appendChild(contentDiv);
-            
-            chatContainer.appendChild(typingDiv);
-            chatContainer.scrollTop = chatContainer.scrollHeight;
-            
-            return id;
+        function updateMessageContent(messageDiv, content) {
+            const textDiv = messageDiv.querySelector('.message-text');
+            textDiv.textContent = content;
         }
 
-        // Function to remove typing indicator
-        function removeTypingIndicator(id) {
-            const typingDiv = document.getElementById(`typing-${id}`);
-            if (typingDiv) {
-                typingDiv.remove();
+        async function loadChats() {
+            try {
+                const response = await fetch('/api/chats');
+                const chats = await response.json();
+                
+                const chatList = document.getElementById('chatList');
+                chatList.innerHTML = '';
+                
+                chats.forEach(chat => {
+                    const chatItem = document.createElement('div');
+                    chatItem.className = 'chat-item';
+                    if (chat.id === currentChatId) {
+                        chatItem.classList.add('active');
+                    }
+                    
+                    chatItem.innerHTML = `
+                        <div class="chat-item-title">${chat.title}</div>
+                        <div class="chat-item-date">${new Date(chat.created_at).toLocaleDateString()}</div>
+                    `;
+                    
+                    chatItem.onclick = () => loadChat(chat.id);
+                    chatList.appendChild(chatItem);
+                });
+            } catch (error) {
+                console.error('Error loading chats:', error);
             }
         }
 
-        // Function to add error message
-        function addErrorMessage(message) {
-            const errorDiv = document.createElement('div');
-            errorDiv.className = 'bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded my-2';
-            errorDiv.textContent = message;
-            chatContainer.appendChild(errorDiv);
-            chatContainer.scrollTop = chatContainer.scrollHeight;
-        }
-
-        // Function to toggle dark mode
-        function toggleDarkMode() {
-            document.body.classList.toggle('dark-mode');
-            if (document.body.classList.contains('dark-mode')) {
-                darkModeToggle.innerHTML = '<i class="fas fa-sun"></i>';
-                localStorage.setItem('darkMode', 'true');
-            } else {
-                darkModeToggle.innerHTML = '<i class="fas fa-moon"></i>';
-                localStorage.setItem('darkMode', 'false');
+        async function loadChat(chatId) {
+            try {
+                const response = await fetch(`/api/chats/${chatId}`);
+                const chat = await response.json();
+                
+                currentChatId = chatId;
+                
+                // Clear messages
+                const messagesContainer = document.getElementById('chatMessages');
+                messagesContainer.innerHTML = '';
+                
+                // Display chat messages
+                chat.messages.forEach(msg => {
+                    addMessageToUI(msg.role, msg.content);
+                });
+                
+                // Update active chat in sidebar
+                document.querySelectorAll('.chat-item').forEach(item => {
+                    item.classList.remove('active');
+                });
+                event.target.closest('.chat-item').classList.add('active');
+                
+                // Close sidebar on mobile
+                if (window.innerWidth <= 768) {
+                    toggleSidebar();
+                }
+            } catch (error) {
+                console.error('Error loading chat:', error);
             }
         }
 
-        // Function to toggle sidebar on mobile
-        function toggleSidebar() {
-            sidePanel.classList.toggle('open');
-            overlay.classList.toggle('hidden');
-        }
-
-        // Function to close sidebar
-        function closeSidebar() {
-            sidePanel.classList.remove('open');
-            overlay.classList.add('hidden');
-        }
-
-        // Function to create a new chat
-        function createNewChat() {
-            const newId = generateId();
-            conversations.unshift({
-                id: newId,
-                title: "New Chat",
-                messages: []
-            });
-            
-            currentConversationId = newId;
-            currentConversationTitle = "New Chat";
-            
-            saveChats();
-            renderChatHistory();
-            
-            // Clear chat container
-            chatContainer.innerHTML = '';
-            // Add welcome message
-            const welcomeDiv = document.createElement('div');
-            welcomeDiv.className = 'flex py-4 bot-message';
-            welcomeDiv.innerHTML = `
-                <div class="w-8 h-8 rounded-full mr-4 overflow-hidden flex-shrink-0" style="background: #5d4037;">
-                    <img src="https://i.postimg.cc/rpP8Jpp7/file-000000000e9861f79665455f8cde01ff.png" alt="Bot" class="w-full h-full object-cover" onerror="this.style.display='none';this.parentNode.innerHTML='<i class=\\'fas fa-robot\\' style=\\'color:white;display:flex;justify-content:center;align-items:center;height:100%\\'></i>'">
-                </div>
-                <div class="flex-1">
-                    <div class="message-content">
-                        <p>👋 Чем могу помочь?</p>
+        function startNewChat() {
+            currentChatId = null;
+            const messagesContainer = document.getElementById('chatMessages');
+            messagesContainer.innerHTML = `
+                <div class="welcome-screen" id="welcomeScreen">
+                    <h1 class="welcome-title">SlonGPT</h1>
+                    <p class="welcome-subtitle">Российский ИИ-ассистент нового поколения</p>
+                    <div class="welcome-features">
+                        <div class="feature-card">
+                            <div class="feature-icon">💬</div>
+                            <div class="feature-title">Диалоги</div>
+                            <div class="feature-desc">Общайтесь на любые темы</div>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-icon">🎨</div>
+                            <div class="feature-title">Изображения</div>
+                            <div class="feature-desc">Создавайте картинки по описанию</div>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-icon">📷</div>
+                            <div class="feature-title">OCR</div>
+                            <div class="feature-desc">Распознавание текста на фото</div>
+                        </div>
                     </div>
                 </div>
             `;
-            chatContainer.appendChild(welcomeDiv);
+            
+            // Remove active class from all chats
+            document.querySelectorAll('.chat-item').forEach(item => {
+                item.classList.remove('active');
+            });
             
             // Close sidebar on mobile
-            closeSidebar();
-        }
-
-        // Function to render chat history
-        function renderChatHistory() {
-            chatHistory.innerHTML = '';
-            
-            conversations.forEach(conv => {
-                const chatItem = document.createElement('div');
-                chatItem.className = `p-2 my-1 rounded-md hover:bg-gray-700 cursor-pointer ${conv.id === currentConversationId ? 'bg-gray-700' : ''}`;
-                chatItem.innerHTML = `
-                    <div class="flex items-center">
-                        <i class="fas fa-comment mr-2"></i>
-                        <span class="truncate">${conv.title}</span>
-                    </div>
-                `;
-                
-                chatItem.addEventListener('click', () => {
-                    loadConversation(conv.id);
-                    closeSidebar();
-                });
-                
-                chatHistory.appendChild(chatItem);
-            });
-        }
-
-        // Function to load a conversation
-        function loadConversation(id) {
-            const conv = conversations.find(c => c.id === id);
-            if (!conv) return;
-            
-            currentConversationId = id;
-            currentConversationTitle = conv.title;
-            
-            // Update active state in sidebar
-            const chatItems = chatHistory.querySelectorAll('div');
-            chatItems.forEach(item => {
-                if (item.classList.contains('bg-gray-700')) {
-                    item.classList.remove('bg-gray-700');
-                }
-            });
-            
-            // Find the clicked item and add the active class
-            chatItems.forEach(item => {
-                if (item.querySelector('span').textContent === conv.title) {
-                    item.classList.add('bg-gray-700');
-                }
-            });
-            
-            // Clear chat container
-            chatContainer.innerHTML = '';
-            
-            // Add welcome message if empty
-            if (conv.messages.length === 0) {
-                const welcomeDiv = document.createElement('div');
-                welcomeDiv.className = 'flex py-4 bot-message';
-                welcomeDiv.innerHTML = `
-                    <div class="w-8 h-8 rounded-full mr-4 overflow-hidden flex-shrink-0" style="background: #5d4037;">
-                        <img src="https://i.postimg.cc/rpP8Jpp7/file-000000000e9861f79665455f8cde01ff.png" alt="Bot" class="w-full h-full object-cover" onerror="this.style.display='none';this.parentNode.innerHTML='<i class=\\'fas fa-robot\\' style=\\'color:white;display:flex;justify-content:center;align-items:center;height:100%\\'></i>'">
-                    </div>
-                    <div class="flex-1">
-                        <div class="message-content">
-                            <p>👋 Чем могу помочь?</p>
-                        </div>
-                    </div>
-                `;
-                chatContainer.appendChild(welcomeDiv);
-                return;
+            if (window.innerWidth <= 768) {
+                toggleSidebar();
             }
-            
-            // Load conversation messages
-            for (let i = 0; i < conv.messages.length; i++) {
-                const msg = conv.messages[i];
-                addMessage(msg.content, msg.role === 'user' ? 'user' : 'bot');
-            }
-        }
-
-        // Function to process code blocks in markdown
-        function processCodeBlocks(text) {
-            // Replace code blocks with proper HTML
-            text = text.replace(/```(\w+)?\n([\s\S]*?)```/g, function(match, language, code) {
-                const lang = language || '';
-                return `<pre class="relative"><code class="${lang}">${escapeHtml(code)}</code></pre>`;
-            });
-            
-            // Replace single-line code with inline code
-            text = text.replace(/`([^`]+)`/g, '<code class="bg-gray-100 dark:bg-gray-800 px-1 py-0.5 rounded">$1</code>');
-            
-            // Convert links
-            text = text.replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank" class="text-amber-700 hover:underline">$1</a>');
-            
-            // Convert newlines to <br>
-            text = text.replace(/\n/g, '<br>');
-            
-            return text;
-        }
-
-        // Function to escape HTML
-        function escapeHtml(text) {
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
-        }
-
-        // Function to add copy buttons to code blocks
-        function addCopyButtonsToCodeBlocks() {
-            document.querySelectorAll('pre').forEach(block => {
-                // Check if button already exists
-                if (block.querySelector('.copy-btn')) return;
-                
-                const button = document.createElement('button');
-                button.className = 'copy-btn';
-                button.textContent = 'Copy';
-                
-                button.addEventListener('click', function() {
-                    const code = block.querySelector('code').textContent;
-                    navigator.clipboard.writeText(code).then(() => {
-                        button.textContent = 'Copied!';
-                        setTimeout(() => {
-                            button.textContent = 'Copy';
-                        }, 2000);
-                    });
-                });
-                
-                block.appendChild(button);
-            });
         }
     </script>
 </body>
